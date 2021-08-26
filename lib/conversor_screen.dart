@@ -10,8 +10,7 @@ class ConversorScreen extends StatefulWidget {
 
 class _ConversorScreenState extends State<ConversorScreen> {
   String moeda = "BRL";
-  var moedas = [];
-
+  var moedas = <dynamic>[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,14 +30,13 @@ class _ConversorScreenState extends State<ConversorScreen> {
             FutureBuilder(
               future: MoedasRest().obterMoedas(),
               builder: (context, snapshot) {
-                //moedas = snapshot.data; ['results']['currencies'];
-
                 if (!snapshot.hasData) {
                   return Center(
                       child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation(Colors.blue),
                   ));
                 } else {
+                  moedas = snapshot.data as List<dynamic>;
                   return Container(
                     padding: EdgeInsets.all(30),
                     child: Row(
@@ -58,11 +56,11 @@ class _ConversorScreenState extends State<ConversorScreen> {
                           flex: 6,
                           child: DropdownButton<String>(
                             value: "BRL",
-                            items: moedas
+                            items: moedas!
                                 .map(
                                   (e) => DropdownMenuItem(
                                     value: "BRL",
-                                    child: Text("${moedas[0]}"),
+                                    child: Text("$e"),
                                   ),
                                 )
                                 .toList(),
