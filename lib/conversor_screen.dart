@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:conversormoeda/moedas_rest.dart';
 import 'package:flutter/material.dart';
 
@@ -9,8 +11,11 @@ class ConversorScreen extends StatefulWidget {
 }
 
 class _ConversorScreenState extends State<ConversorScreen> {
-  String moeda = "BRL";
-  var moedas = <dynamic>[];
+  String moeda = "Dollar";
+  double cotacao = 0.0;
+  var moedas = <String>[];
+  var cotacoes = <double>[];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +41,8 @@ class _ConversorScreenState extends State<ConversorScreen> {
                     valueColor: AlwaysStoppedAnimation(Colors.blue),
                   ));
                 } else {
-                  moedas = snapshot.data as List<dynamic>;
+                  converterJson(snapshot.data as String);
+
                   return Container(
                     padding: EdgeInsets.all(30),
                     child: Row(
@@ -55,11 +61,11 @@ class _ConversorScreenState extends State<ConversorScreen> {
                         Expanded(
                           flex: 6,
                           child: DropdownButton<String>(
-                            value: "BRL",
-                            items: moedas!
+                            value: moedas[0],
+                            items: moedas
                                 .map(
                                   (e) => DropdownMenuItem(
-                                    value: "BRL",
+                                    value: "$e",
                                     child: Text("$e"),
                                   ),
                                 )
@@ -90,5 +96,27 @@ class _ConversorScreenState extends State<ConversorScreen> {
             )
           ],
         ));
+  }
+
+  void converterJson(String data) {
+    Map<String, dynamic> json =
+        JsonDecoder().convert(data) as Map<String, dynamic>;
+    print(json.runtimeType);
+
+    //var currencies = json['results']['currencies'];
+    //var source = currencies['source'];
+    //print(source);
+    var currencies = json['results']['currencies'];
+
+    //print(moedas);
+
+    currencies.forEach((k, v) {
+      //print("$k - $v");
+      if (v.runtimeType != String) {
+        //print(v['buy']);
+        moedas.add(v['name']);
+        cotacoes.add(v['buy']);
+      }
+    });
   }
 }
