@@ -101,21 +101,22 @@ class _ConversorScreenState extends State<ConversorScreen> {
   void converterJson(String data) {
     Map<String, dynamic> json =
         JsonDecoder().convert(data) as Map<String, dynamic>;
+    //imprime o tipo do valor da variável
     print(json.runtimeType);
 
-    //var currencies = json['results']['currencies'];
-    //var source = currencies['source'];
-    //print(source);
+    //obtem o valor da chave currencies dentro do valor da chave results
     var currencies = json['results']['currencies'];
 
-    //print(moedas);
-
+    //itera pelo map. Ou seja, passa por todos as chaves encontradas em currencies que
+    //é um Map<String,dynamic>
     currencies.forEach((k, v) {
-      //print("$k - $v");
+      // para cada   chave e valor faça
       if (v.runtimeType != String) {
-        //print(v['buy']);
-        moedas.add(v['name']);
-        cotacoes.add(v['buy']);
+        // verificando se o valor é a string 'BRL',que não nos interessa
+
+        moedas.add(
+            v['name']); // apenas das moedas que irei converter - chave name
+        cotacoes.add(v['buy']); // e o seu valor de compra - chave buy
       }
     });
   }
