@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:conversormoeda/moedas_rest.dart';
 import 'package:flutter/material.dart';
 
+import 'moeda.dart';
+
 class ConversorScreen extends StatefulWidget {
   const ConversorScreen({Key? key}) : super(key: key);
 
@@ -11,10 +13,14 @@ class ConversorScreen extends StatefulWidget {
 }
 
 class _ConversorScreenState extends State<ConversorScreen> {
-  String moeda = "Dollar";
+  Moeda? moeda;
   double cotacao = 0.0;
-  var moedas = <String>[];
-  var cotacoes = <double>[];
+  double valor = 0.0;
+  var moedas = <Moeda>[];
+
+  var _valorController = TextEditingController();
+
+  var _originalController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +56,7 @@ class _ConversorScreenState extends State<ConversorScreen> {
                         Expanded(
                           flex: 10,
                           child: TextField(
+                            controller: _originalController,
                             decoration: InputDecoration(
                               labelText: 'Valor em R\$(Real)',
                             ),
@@ -59,20 +66,29 @@ class _ConversorScreenState extends State<ConversorScreen> {
                           flex: 1,
                         ),
                         Expanded(
-                          flex: 6,
-                          child: DropdownButton<String>(
+                          flex: 12,
+                          child: DropdownButton<Moeda>(
                             value: moedas[0],
                             items: moedas
                                 .map(
                                   (e) => DropdownMenuItem(
-                                    value: "$e",
-                                    child: Text("$e"),
+                                    value: e,
+                                    child: Text("${e.nome}"),
                                   ),
                                 )
                                 .toList(),
                             onChanged: (value) {
                               setState(() {
-                                moeda = value!;
+                                moeda = value;
+                                double original = 0.0;
+
+                                original = double.tryParse(
+                                        _originalController.value.text) ??
+                                    0.0;
+
+                                double valor = (moeda?.valor ?? 0.0) * original;
+                                _valorController.text =
+                                    valor.toStringAsFixed(2);
                               });
                             },
                           ),
@@ -83,6 +99,7 @@ class _ConversorScreenState extends State<ConversorScreen> {
                         Expanded(
                           flex: 10,
                           child: TextField(
+                            controller: _valorController,
                             decoration: InputDecoration(
                               labelText: 'Valor em $moeda',
                             ),
@@ -114,9 +131,9 @@ class _ConversorScreenState extends State<ConversorScreen> {
       if (v.runtimeType != String) {
         // verificando se o valor é a string 'BRL',que não nos interessa
 
-        moedas.add(
-            v['name']); // apenas das moedas que irei converter - chave name
-        cotacoes.add(v['buy']); // e o seu valor de compra - chave buy
+        moedas.add(Moeda(v["name"],
+            v["buy"])); // apenas das moedas que irei converter - chave name
+
       }
     });
   }
